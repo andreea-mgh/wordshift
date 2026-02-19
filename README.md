@@ -1,3 +1,3 @@
 # Wordshift
 
-IPA estimation and substitution utility for constructed languages.
+IPA estimation and substitution utility for constructed and natural languages.
