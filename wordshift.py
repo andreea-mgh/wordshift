@@ -6,7 +6,7 @@ DIR = Path(__file__).resolve().parent
 ## 0. define groups
 ## 1. substitute presubstitution rules
 ## 2. map letters to IPA
-## 3. apply POST sound changes
+## 3. apply POST sound changes 
 def expand_string(pattern, groups, verbose=False):
     """Recursively expand a pattern string into all possible concrete strings."""
     if not pattern:
@@ -61,17 +61,19 @@ def apply_ruleset(ruleset_path, input_path, verbose_expansion=False, verbose_rul
 
     ## GROUP
     groups = {}
-    for group in ruleset["GROUP"]:
-        groups[group[0]] = group[1].split(',')
-        if verbose_rules:
-            print(f"Defined group {group[0]}: {groups[group[0]]}")
+    if "GROUP" in ruleset:
+        for group in ruleset["GROUP"]:
+            groups[group[0]] = group[1].split(',')
+            if verbose_rules:
+                print(f"Defined group {group[0]}: {groups[group[0]]}")
     
-    ## TODO: pre-substitution rules
+    ## TODO: pre-substitution rules ?
     
     ## SUBSTITUTION
-    for substitution in ruleset["SUBST"]:
-        for i, word in enumerate(input_words):
-            input_words[i] = word.replace(substitution[0], substitution[1])
+    if "SUBST" in ruleset:
+        for substitution in ruleset["SUBST"]:
+            for i, word in enumerate(input_words):
+                input_words[i] = word.replace(substitution[0], substitution[1])
     
     ## POST RULES
     for post_rule in ruleset["POST"]:
@@ -119,7 +121,9 @@ def apply_ruleset(ruleset_path, input_path, verbose_expansion=False, verbose_rul
 
         for s1, s2 in zip(S1, S2):
             for i, word in enumerate(input_words):
-                input_words[i] = word.replace(s1, s2)
+                word = '%' + word + '%' # for word boundary context
+                word = word.replace(s1, s2)
+                input_words[i] = word[1:-1]
         
 
     return input_words
@@ -129,4 +133,4 @@ def apply_ruleset(ruleset_path, input_path, verbose_expansion=False, verbose_rul
 
 ruleset_path = DIR / "ruleset.txt"
 input_path = DIR / "input.txt"
-print(apply_ruleset(ruleset_path, input_path))
+print(apply_ruleset(ruleset_path, input_path, verbose_rules=True))
